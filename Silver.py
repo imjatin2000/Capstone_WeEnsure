@@ -5,21 +5,6 @@ import dlt
 
 # COMMAND ----------
 
-# @dlt.create_table(
-#   comment="The cleaned customers, ingested from delta and partitioned by city",
-#   partition_cols=["city"],
-#   table_properties={
-#     "Globalmart_deltaliv.quality": "silver",
-#     "pipelines.autoOptimize.managed": "true"
-#   }
-# )
-# def customers_clean():
-#     customers_df = spark.read.format("delta").load("dbfs:/pipelines/cb7e2f6c-7567-4318-9171-0b8c8e5772db/tables/customers_raw")
-#     customers_df = customers_df.select([col(column).alias(column.lower()) for column in customers_df.columns])
-#     return customers_df
-
-# COMMAND ----------
-
 @dlt.create_table(
   comment="Cleaned reimbursement data partitioned by reimbursement_date",
   partition_cols=["reimbursement_date"],
