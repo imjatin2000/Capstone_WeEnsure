@@ -22,6 +22,9 @@ def reimbursements_clean():
     # Check for duplicacy based on claim_number and reimbursement_number
     reimbursements_df = reimbursements_df.dropDuplicates(["claim_number", "reimbursement_number"])
     
+    #Cast amount into DecimalType
+    reimbursements_df = reimbursements_df.withColumn("amount_approved", reimbursements_df["amount_approved"].cast(DecimalType(10, 2)))
+
     # Cast reimbursement_date to DATE format
     reimbursements_df = reimbursements_df.withColumn("reimbursement_date", to_date(reimbursements_df["reimbursement_date"], "M/d/yyyy"))
     
