@@ -173,6 +173,7 @@ def claims_clean():
 def plans_clean():
     plans_df = dlt.read('plans')
     plans_df = plans_df.select([col(column).alias(column.lower()) for column in plans_df.columns])
+    plans_df = plans_df.dropDuplicates(["plan_id"])
     return plans_df
 
 # COMMAND ----------
@@ -191,6 +192,7 @@ def plans_clean():
 def policies_clean():
     policies_df = dlt.read('policies')
     policies_df = policies_df.select([col(column).alias(column.lower()) for column in policies_df.columns])
+    policies_df=policies_df.dropDuplicates(["policy_number"])
     return policies_df
 
 # COMMAND ----------
