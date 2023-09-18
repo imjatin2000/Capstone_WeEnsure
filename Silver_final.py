@@ -55,6 +55,18 @@ def provider_clean():
 
 # COMMAND ----------
 
+def standardize_phone_numbers(column):
+
+        # Remove commas, spaces, and dashes
+        cleaned_phone = regexp_replace(column,  "[(\\s\\-\\)]", "")
+        cleaned_phone = regexp_replace(cleaned_phone, "\\+91\\s*", "")
+        cleaned_phone = regexp_replace(cleaned_phone,  ",", "/")
+        standardized_phone = regexp_replace(cleaned_phone, "(\\d{11})([^/])", "$1/$2")
+
+        return standardized_phone
+
+# COMMAND ----------
+
 # Create a Delta Lake table for subscribers
 @dlt.create_table(
     comment="Cleaned subscribers data",
@@ -67,19 +79,10 @@ def provider_clean():
 def subscribers_clean():
     subscribers_df = dlt.read("subscribers") 
 
-    # Data cleaning and transformations
+    # Apply the UDF to the phone number column
 
-    # STEP 1: Replace "/" with ","
-    subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), "/", ","))
-
-    # STEP 2: Remove whitespaces
-    subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), "\\s+", ""))
-
-    # STEP 3: Remove characters from the phone column except numeric, ",", and "+"
-    subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), "[^0-9,\\+]", ""))
-
-    #STEP 4: Lowercase column names
-    subscribers_df = subscribers_df.select([col(column).alias(column.lower()) for column in subscribers_df.columns])
+    subscribers_df = subscribers_df.withColumn("phone", standardize_phone_numbers(col("phone")))
+    subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), r"/(\d{8})/", r"/022$1/"))
 
     return subscribers_df
 
