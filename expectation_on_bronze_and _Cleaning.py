@@ -18,7 +18,7 @@ import dlt
   comment="The cleaned customers, ingested from delta and partitioned by agent_id",
   partition_cols=["agent_id"],
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -42,7 +42,7 @@ def customers_clean():
   comment="The cleaned payments, ingested from delta and partitioned by paid_amount",
   partition_cols=["paid_amount"],
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -70,7 +70,7 @@ def payments_clean():
   comment="The cleaned plans and partitioned by payment_type",
     partition_cols=["payment_type"],
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -93,7 +93,7 @@ def plans_clean():
   comment="The cleaned policies and partitioned by plan_id",
     partition_cols=["plan_id"],
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -116,7 +116,7 @@ def policies_clean():
 @dlt.create_table(
   comment="The cleaned provider ",
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -138,7 +138,7 @@ def provider_clean():
 @dlt.create_table(
   comment="The cleaned reimbursement",
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -161,7 +161,7 @@ def reimbursement_clean():
   comment="The cleaned subscribers and partitioned by sub_type",
     partition_cols=["sub_type"],
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -190,7 +190,7 @@ def subscribers_clean():
   comment="The cleaned rejected_claims and partitioned by reason",
     partition_cols=["reason"],
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -212,7 +212,7 @@ def rejected_claims_clean():
 @dlt.create_table(
   comment="The cleaned agents",
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -235,7 +235,7 @@ def agents_clean():
   comment="The cleaned claims and partitioned by provider_id",
     partition_cols=["provider_id"],
   table_properties={
-    "Globalmart_deltaliv.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
