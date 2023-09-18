@@ -144,5 +144,7 @@ def customers():
 )
 def subscribers():
 
-    subscribers_df = spark.read.csv("dbfs:/mnt/weEnsures/unzipped/subscribers.csv", header=True, inferSchema=True)
+    # subscribers_df = spark.read.format("delta").load("dbfs:/mnt/weEnsures/unzipped/subscribers.csv")
+    subscribers_df = spark.read.option("header", "true").option("inferSchema", "true").option("multiline", "true").csv("dbfs:/mnt/weEnsures/unzipped/subscribers.csv")
+
     return subscribers_df
