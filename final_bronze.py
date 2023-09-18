@@ -12,7 +12,7 @@ import dlt
 @dlt.create_table(
   comment="The Raw Customers table",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -26,7 +26,7 @@ def customers_raw():
 @dlt.create_table(
   comment="The raw Agents table",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -40,7 +40,7 @@ def agents_raw():
 @dlt.create_table(
   comment="The Raw Payment Table",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -53,7 +53,7 @@ def payments_raw():
 @dlt.create_table(
   comment="The raw reimbursement",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -67,7 +67,7 @@ def reimbursement_raw():
 @dlt.create_table(
   comment="The raw Providers",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -81,7 +81,7 @@ def provider_raw():
 @dlt.create_table(
   comment="The raw Claims table",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -96,7 +96,7 @@ def claims_raw():
 @dlt.create_table(
   comment="The raw Plans table",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -110,7 +110,7 @@ def plans_raw():
 @dlt.create_table(
   comment="The raw Policies table",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -124,7 +124,7 @@ def policies_raw():
 @dlt.create_table(
   comment="The raw Rejected_claims table",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
@@ -138,7 +138,7 @@ def rejected_claims_raw():
 @dlt.create_table(
   comment="The raw Subscribers table",
   table_properties={
-    "Globalmart_delta.quality": "bronze",
+    "weEnsure_delta.quality": "bronze",
     "pipelines.autoOptimize.managed": "true"
   }
 )
