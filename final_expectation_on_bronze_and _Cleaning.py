@@ -5,7 +5,7 @@ import dlt
 
 # COMMAND ----------
 
-# MAGIC %run "/Users/jatin_1692255857312@npmentorskool.onmicrosoft.com/capstone/bronze"
+# MAGIC %run "/Repos/capstone/Capstone_WeEnsure/final_bronze"
 
 # COMMAND ----------
 
@@ -218,7 +218,13 @@ def rejected_claims_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_agent": "agent_id IS NOT NULL "})
+@dlt.expect_all({
+    "valid_agent_id": "agent_id IS NOT NULL",
+    "valid_name": "name IS NOT NULL",
+    "valid_email": "agent_email IS NOT NULL AND agent_email LIKE '%@%.%'",
+    "valid_address": "address IS NOT NULL",
+    "valid_phone": "phone IS NOT NULL AND LENGTH(phone) = 10 AND phone IS NUMERIC"
+})
 
 def agents_clean():
     agents_df = dlt.read('agents_raw')
@@ -241,8 +247,13 @@ def agents_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_provider": "provider_id IS NOT NULL ","valid_policy": "policy_number IS NOT NULL ","valid_claim": "claim_number IS NOT NULL "})
-
+@dlt.expect_all({
+    "valid_provider": "provider_id IS NOT NULL",
+    "valid_policy": "policy_number IS NOT NULL",
+    "valid_claim": "claim_number IS NOT NULL",
+    "claim_amount_bigger_than_zero": "amount_claimed > 0",
+    "valid_date_format": "TO_DATE(claim_date, 'MM/dd/yyyy') IS NOT NULL"
+})
 def claims_clean():
     claims_df = dlt.read('claims_raw')
     claims_df = claims_df.select([col(column).alias(column.lower()) for column in claims_df.columns])
