@@ -21,8 +21,8 @@ def claim_freq(df):
 
     # Group by customer_id, quarter, and year and count the number of claims
     claims_count = df.groupBy("customer_id", "quarter").agg(count("*").alias("Number_of_Claims"))
-    claims_avg = claims_count.groupBy("customer_id").agg(avg("Number_of_Claims").alias("Average Claim Frequency"))
-    return claims_count
+    claims_avg = claims_count.groupBy("customer_id").agg(avg("Number_of_Claims").alias("AverageClaimFrequency"))
+    return claims_avg
 
 # COMMAND ----------
 
@@ -58,7 +58,7 @@ def avg_settlement_days(df):
 
 def invalid_claims(df):
     df = df.withColumn("isInvalid", when(col("amount_claimed")>col("insurance_coverage"),1).otherwise(0))
-    invalid_df = df.groupBy("customer_id").agg(sum("isInvalid").alias("invalid claims"))
+    invalid_df = df.groupBy("customer_id").agg(sum("isInvalid").alias("invalidClaims"))
     return invalid_df
 
 # COMMAND ----------
@@ -67,13 +67,13 @@ def reimb_to_claims(df):
     x = df.groupBy("customer_id").agg(sum("amount_approved").alias("total_reimbursmant_amount"))
     y = df.groupBy("customer_id").agg(sum("amount_claimed").alias("total_amount_claimed"))
     df = x.join(y,"customer_id","inner")
-    df = df.withColumn("reimbursmant to claim amount ratio",col("total_reimbursmant_amount")/col("total_amount_claimed")).select("customer_id","reimbursmant to claim amount ratio")
+    df = df.withColumn("reimbursmant_to_claim_amount_ratio",col("total_reimbursmant_amount")/col("total_amount_claimed")).select("customer_id","reimbursmant_to_claim_amount_ratio")
     return df
 
 # COMMAND ----------
 
 def claims_rejected(df):
-    df = df.groupBy("customer_id").agg(count("customer_id").alias("total claims rejected"))
+    df = df.groupBy("customer_id").agg(count("customer_id").alias("total_claims_rejected"))
     return df
 
 # COMMAND ----------
@@ -111,7 +111,7 @@ def CustomerFacts():
     rejXpolicyXclaim = policyXclaim.join(rejected_claims_df,"claim_number","inner")
     TotalClaimsRejected_df = claims_rejected(rejXpolicyXclaim)
 
-    customers_agg_df = policyRenewals_df.join(claimFrequency_df,"customer_id","inner").join(premiumToClaimRatio_df,"customer_id","inner").join(AvgSettlementDays_df,"customer_id","inner").join(InvalidClaims_df,"customer_id","inner").join(reimbusementToClaimsAmount_df,"customer_id","inner").join(TotalClaimsRejected_df,"customer_id","inner")
+    customers_agg_df = policyRenewals_df.join(claimFrequency_df,"customer_id","left").join(premiumToClaimRatio_df,"customer_id","left").join(AvgSettlementDays_df,"customer_id","left").join(reimbusementToClaimsAmount_df,"customer_id","left").join(TotalClaimsRejected_df,"customer_id","left").join(InvalidClaims_df,"customer_id","left")
     return customers_agg_df
 
 # COMMAND ----------
