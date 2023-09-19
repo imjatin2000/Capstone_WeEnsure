@@ -61,6 +61,21 @@ print(f"The agent who worked with least customers: {worst_agent_value}")
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ####Agents who have generated the highest and lowest premium amount
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT a.agent_id, a.name AS agent_name, SUM(p.daily_premium) AS total_premium_generated
+# MAGIC FROM capstone.agents_clean a
+# MAGIC LEFT JOIN capstone.customers_clean c ON a.agent_id = c.agent_id
+# MAGIC LEFT JOIN capstone.policies_clean p ON c.customer_id = p.customer_id
+# MAGIC GROUP BY a.agent_id, a.name
+# MAGIC ORDER BY total_premium_generated DESC
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC ###PLANS
 
 # COMMAND ----------
@@ -72,6 +87,7 @@ print(f"The agent who worked with least customers: {worst_agent_value}")
 
 joined_data = policies_df.join(plans_df, "plan_id", "inner")
 
+#Grouping data and calculating the average daily premium and insurance coverage for the plans
 result = (
     joined_data
     .groupBy("plan_id")
@@ -98,6 +114,7 @@ joined_data = (
     .join(subscribers_df, "sub_id", "inner")
 )
 
+#Grouping data and counting the number of subscribers in the plans
 result = (
     joined_data
     .groupBy("plan_id")
@@ -106,6 +123,19 @@ result = (
 )
 
 display(result)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ####Policies with the highest and lowest average policy duration
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT Pl.plan_id, round(AVG(DATEDIFF(P.policy_end_date, P.policy_start_date)),2) AS avg_policy_duration_new
+# MAGIC FROM capstone.Policies_clean P
+# MAGIC LEFT JOIN capstone.Plans_clean Pl ON P.plan_id = Pl.plan_id
+# MAGIC GROUP BY Pl.plan_id;
 
 # COMMAND ----------
 
@@ -119,11 +149,11 @@ display(result)
 
 # COMMAND ----------
 
-total_payments = payments_df.select(sum("paid_amount"))
+total_payments = payments_df.select(sum("paid_amount")).collect()[0][0]
 display(total_payments)
 
 # Print the total payments
-#print("Total Payments Across All Policies: {:.2f}".format(total_payments))
+print("Total Payments Across All Policies: {:.2f}".format(total_payments))
 
 # COMMAND ----------
 
@@ -138,6 +168,8 @@ display(total_payments)
 # COMMAND ----------
 
 joined_data = customers_df.join(policies_df, "customer_id").join(payments_df, "policy_number")
+
+#Grouping the data and summing up the paid amount
 total_payments = joined_data.groupBy("customer_id", "customer_name").agg(sum("paid_amount").alias("total_payments"))
 
 # Order the results by total_payments in descending order and limit to the top 5
@@ -147,30 +179,7 @@ display(result)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ###PROVIDERS
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ####Top 5 Providers
-
-# COMMAND ----------
-
-joined_data = (
-    provider_df
-    .join(claims_df, "provider_id", "left")
-    .join(policies_df, "policy_number", "left")
-)
-
-policies_sold = (
-    joined_data
-    .groupBy("provider_name")
-    .agg(count("policy_number").alias("policies_sold"))
-)
-
-# Order the results by policies_sold in descending order and limit to the top 5
-result = policies_sold.orderBy(policies_sold["policies_sold"].desc())
-display(result)
+# MAGIC ####Number of customers who has opted for least premium policy amount
 
 # COMMAND ----------
 
@@ -197,6 +206,119 @@ num_customers_with_least_premium = customers_with_least_premium.count()
 # Show the result
 print(f"Number of customers with the least premium policy: {num_customers_with_least_premium}")
 
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###PROVIDERS
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ####Top 5 Providers
+
+# COMMAND ----------
+
+joined_data = (
+    provider_df
+    .join(claims_df, "provider_id", "left")
+    .join(policies_df, "policy_number", "left")
+)
+
+#Grouping the data and counting the number of policies per provider
+policies_sold = (
+    joined_data
+    .groupBy("provider_name")
+    .agg(count("policy_number").alias("policies_sold"))
+)
+
+# Order the results by policies_sold in descending order and limit to the top 5
+result = policies_sold.orderBy(policies_sold["policies_sold"].desc())
+display(result)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###REIMBURSEMENTS
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ####Customer who got the highest reimbursement amount
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT cu.customer_id, cu.customer_name, round(SUM(r.amount_approved),2) AS total_reimbursement_amount
+# MAGIC FROM capstone.customers_clean cu
+# MAGIC JOIN capstone.Policies_clean po ON cu.customer_id = po.customer_id
+# MAGIC JOIN capstone.claims_clean c ON po.policy_number = c.policy_number
+# MAGIC JOIN capstone.Reimbursements_clean r ON c.claim_number = r.claim_number
+# MAGIC GROUP BY cu.customer_id, cu.customer_name
+# MAGIC ORDER BY total_reimbursement_amount DESC;
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ####Overall Average Reimbursed amount
+
+# COMMAND ----------
+
+average_reimbursed_amount = reimbursements_df.agg(avg("amount_approved").alias("average_reimbursed_amount")).collect()[0]["average_reimbursed_amount"]
+
+# Show the result
+print(f"Average Reimbursed Amount: Rs.{average_reimbursed_amount:.2f}")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ####Treatments grouped by number of claims approved
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT c.treatment, count(c.treatment) AS claims_approved
+# MAGIC FROM capstone.Reimbursements_clean r
+# MAGIC join capstone.claims_clean c on c.claim_number= r.claim_number
+# MAGIC group by c.treatment
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###CLAIMS
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ####Number of Claims by Treatment Type
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT C.treatment, COUNT(*) AS total_claims_new
+# MAGIC FROM capstone.Claims_clean C
+# MAGIC GROUP BY C.treatment;
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ####Overall Average Claim amount
+
+# COMMAND ----------
+
+average_claim_amount = claims_df.agg(avg("amount_claimed").alias("average_claim_amount")).collect()[0]["average_claim_amount"]
+
+# Show the result
+print(f"Average Claim Amount: Rs.{average_claim_amount:.2f}")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###POLICIES
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ####Percentage of people who have paid the full amount for their policy
 
 # COMMAND ----------
 
@@ -217,17 +339,3 @@ fully_paid_percentage = (fully_paid_df.filter(col("fully_paid") == 1).count() / 
 
 # Show the result
 print(f"Percentage of people who have paid the full amount for their policy: {fully_paid_percentage:.2f}%")
-
-# COMMAND ----------
-
-average_claim_amount = claims_df.agg(avg("amount_claimed").alias("average_claim_amount")).collect()[0]["average_claim_amount"]
-
-# Show the result
-print(f"Average Claim Amount: Rs.{average_claim_amount:.2f}")
-
-# COMMAND ----------
-
-average_reimbursed_amount = reimbursements_df.agg(avg("amount_approved").alias("average_reimbursed_amount")).collect()[0]["average_reimbursed_amount"]
-
-# Show the result
-print(f"Average Claim Amount: Rs.{average_reimbursed_amount:.2f}")
