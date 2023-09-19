@@ -116,11 +116,13 @@ def policies_clean():
 @dlt.create_table(
   comment="The cleaned provider ",
   table_properties={
-    "WeEnsure.quality": "silver",
+    "weEnsure_deltaliv.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
 @dlt.expect_all({"valid_provider": "provider_id IS NOT NULL "})
+# Expectation to warn if phone number != 10 digits
+@dlt.expect_all({"valid_phone_number":"LENGTH(phone) == 10"})
 
 def provider_clean():
     provider_df = dlt.read('provider_raw')
