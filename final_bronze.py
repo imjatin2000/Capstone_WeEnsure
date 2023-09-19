@@ -17,11 +17,14 @@ import dlt
   }
 )
 def customers_raw():
-    """
-    This function creates customers_raw delta live table by reading the customers data from the ADLS container. 
+     """
+    Load and create the Raw Customers Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of customers.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw customer data.
     """
     customers_df = spark.read.option("multiline", "true").csv("dbfs:/mnt/batchdata/unzipped/customers.csv", header=True, inferSchema=True)
     return customers_df
@@ -36,11 +39,14 @@ def customers_raw():
   }
 )
 def agents_raw():
-    """
-    This function creates agents_raw delta live table by reading the agents data from the ADLS container. 
+     """
+    Load and create the Raw Agents Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of agents.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw agents data.
     """
     agents_df = spark.read.option("multiline", "true").csv("dbfs:/mnt/batchdata/unzipped/agents.csv", header=True, inferSchema=True)
     return agents_df
@@ -55,11 +61,14 @@ def agents_raw():
   }
 )
 def payments_raw():
-    """
-    This function creates payments_raw delta live table by reading the payments data from the ADLS container. 
+     """
+    Load and create the Raw Payments Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of payments.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw payments data.
     """
     payment_df = spark.read.csv("dbfs:/mnt/batchdata/unzipped/Payment.csv", header=True, inferSchema=True)
     return payment_df
@@ -74,11 +83,14 @@ def payments_raw():
   }
 )
 def reimbursement_raw():
-    """
-    This function creates reimbursement_raw delta live table by reading the reimbursement data from the ADLS container. 
+     """
+    Load and create the Raw Reimbursements Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of reimbursements.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw reimbursements data.
     """
     reimbursement_df = spark.read.csv("dbfs:/mnt/batchdata/unzipped/Reimbursement.csv", header=True, inferSchema=True)
     return reimbursement_df
@@ -93,11 +105,14 @@ def reimbursement_raw():
   }
 )
 def provider_raw():
-    """
-    This function creates provider_raw delta live table by reading the provider data from the ADLS container. 
+     """
+    Load and create the Raw Providers Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of provider.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw provider data.
     """
     provider_df = spark.read.option("multiline", "true").csv("dbfs:/mnt/batchdata/unzipped/Provider.csv", header=True, inferSchema=True)
     return provider_df
@@ -112,11 +127,14 @@ def provider_raw():
   }
 )
 def claims_raw():
-    """
-    This function creates claims_raw delta live table by reading the claims data from the ADLS container. 
+     """
+    Load and create the Raw Claims Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of claims.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw claims data.
     """
     claims_df = spark.read.csv("dbfs:/mnt/batchdata/unzipped/Claims.csv", header=True, inferSchema=True)
     return claims_df
@@ -132,11 +150,14 @@ def claims_raw():
   }
 )
 def plans_raw():
-    """
-    This function creates plans_raw delta live table by reading the plans data from the ADLS container. 
+     """
+    Load and create the Raw Plans Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of plans.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw plans data.
     """
     plans_df = spark.read.csv("dbfs:/mnt/batchdata/unzipped/Plans.csv", header=True, inferSchema=True)
     return plans_df
@@ -151,11 +172,14 @@ def plans_raw():
   }
 )
 def policies_raw():
-    """
-    This function creates policies_raw delta live table by reading the policies data from the ADLS container. 
+     """
+    Load and create the Raw Policies Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of policies.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw policies data.
     """
     policies_df = spark.read.csv("dbfs:/mnt/batchdata/unzipped/Policies.csv", header=True, inferSchema=True)
     return policies_df
@@ -171,11 +195,14 @@ def policies_raw():
   }
 )
 def rejected_claims_raw():
-    """
-    This function creates rejected_claims_raw delta live table by reading the rejected_claims data from the ADLS container. 
+     """
+    Load and create the Raw Rejected Claims Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of rejected claims.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw rejected claims data.
     """
     rejected_claims_df = spark.read.csv("dbfs:/mnt/batchdata/unzipped/Rejected_claims.csv", header=True, inferSchema=True)
     return rejected_claims_df
@@ -190,11 +217,14 @@ def rejected_claims_raw():
   }
 )
 def subscribers_raw():
-    """
-    This function creates subscribers_raw delta live table by reading the subscribers data from the ADLS container. 
+     """
+    Load and create the Raw Subscribers Delta Lake table.
+
+    This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
+    The table represents the raw, unprocessed data of subscribers.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw subscribers data.
     """
     subscribers_df = spark.read.option("multiline", "true").csv("dbfs:/mnt/batchdata/unzipped/subscribers.csv", header=True, inferSchema=True)
     return subscribers_df
@@ -216,10 +246,13 @@ def subscribers_raw():
 
 def customer_stream_raw():
     """
-    This function creates customers_stream_raw delta live table by reading the streamed customers data from the stremed ADLS container. This also alters the column table as a full string without whitespaces.
+    Load and create a Delta Lake table for raw customer streaming data.
+
+    This function reads streaming data in Parquet format from a specified location
+    and creates a Delta Lake table for the raw customer streaming data.
 
     Returns:
-        None
+        pyspark.sql.DataFrame: A Spark SQL DataFrame containing the raw customer streaming data.
     """
     stream_df = spark.readStream.format("cloudFiles") \
                           .option("cloudFiles.format", "parquet") \
