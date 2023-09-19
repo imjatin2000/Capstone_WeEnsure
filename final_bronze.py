@@ -147,4 +147,30 @@ def subscribers_raw():
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC streaming
+
+# COMMAND ----------
+
+@dlt.create_table(
+  comment="The raw customers stream data.",
+  table_properties={
+    "WeEnsure_delta.quality": "bronze",
+    "pipelines.autoOptimize.managed": "true"
+  }
+)
+
+def customer_stream_raw():
+    stream_df = spark.readStream.format("cloudFiles") \
+                          .option("cloudFiles.format", "parquet") \
+                          .option("cloudFiles.schemaLocation", 
+                                  "dbfs:/mnt/streaming/loader_stream/_schemas/") \
+                          .load("dbfs:/mnt/weensurestreaming/")
+    column_names = stream_df.columns
+    for column_name in column_names:
+        stream_df = stream_df.withColumnRenamed(column_name, column_name.replace(" ", "_"))
+    return stream_df
+
+# COMMAND ----------
+
 
