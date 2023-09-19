@@ -5,7 +5,11 @@ import dlt
 
 # COMMAND ----------
 
+<<<<<<< Updated upstream
 # MAGIC %run "/Repos/capstone/Capstone_WeEnsure/final_bronze"
+=======
+# MAGIC %run "/Repos/Capstone/Capstone_WeEnsure/final_bronze"
+>>>>>>> Stashed changes
 
 # COMMAND ----------
 
@@ -160,14 +164,20 @@ def reimbursement_clean():
 # COMMAND ----------
 
 @dlt.create_table(
-  comment="The cleaned subscribers and partitioned by sub_type",
-    partition_cols=["sub_type"],
+  comment="The cleaned subscribers",
   table_properties={
     "WeEnsure.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_subscriber": "sub_id IS NOT NULL "})
+@dlt.expect_all({
+    "valid_subscriber_id": "sub_id IS NOT NULL",
+    "valid_name": "name IS NOT NULL AND LENGTH(name) > 0",
+    "valid_phone": "phone IS NOT NULL AND LENGTH(phone) > 9",
+    "valid_mail": "mail LIKE '%@%'",
+    "valid_address": "address IS NOT NULL AND LENGTH(address) > 0",
+    "valid_sub_type": "sub_type IS NOT NULL"
+})
 
 def subscribers_clean():
     subscribers_df = dlt.read('subscribers_raw')
@@ -178,7 +188,6 @@ def subscribers_clean():
     subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), ",", "/"))
     subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), "(\\d{11})([^/])", "$1/$2"))
     subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), r"/(\d{8})/", r"/022$1/"))
-    subscribers_df = subscribers_df.dropDuplicates()
     return subscribers_df
 
 # COMMAND ----------
@@ -196,7 +205,13 @@ def subscribers_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_claim": "claim_number IS NOT NULL "})
+
+@dlt.expect_all({
+    "valid_claim": "claim_number IS NOT NULL",
+    "valid_rejection_id": "rejection_id IS NOT NULL",
+    "valid_rejection_reason": "reason IS NOT NULL AND LENGTH(reason) > 0",
+    "valid_rejection_date": "rejection_date IS NOT NULL"
+})
 
 def rejected_claims_clean():
     rejected_claims_df = dlt.read('rejected_claims_raw')
