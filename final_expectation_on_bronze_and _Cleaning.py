@@ -5,11 +5,7 @@ import dlt
 
 # COMMAND ----------
 
-<<<<<<< Updated upstream
-# MAGIC %run "/Repos/capstone/Capstone_WeEnsure/final_bronze"
-=======
-# MAGIC %run "/Repos/Capstone/Capstone_WeEnsure/final_bronze"
->>>>>>> Stashed changes
+# MAGIC %run "/Users/jatin_1692255857312@npmentorskool.onmicrosoft.com/capstone/bronze"
 
 # COMMAND ----------
 
@@ -27,7 +23,7 @@ import dlt
   }
 )
 
-@dlt.expect_all_or_drop({"valid_customer": "customer_id IS NOT NULL "})
+@dlt.expect_all({"valid_customer": "customer_id IS NOT NULL ","valid_phone":"len(phone)=10","valid_family":"family_members>=0"})
 
 def customers_clean():
     customers_df = dlt.read('customers_raw')
@@ -51,7 +47,7 @@ def customers_clean():
   }
 )
 
-@dlt.expect_all({"valid_paid_amount": "paid_amount > 0"})
+@dlt.expect_all({"valid_payment": "payment_id IS NOT NULL ","valid_policy": "policy_number IS NOT NULL ","valid_paid_amount": "paid_amount >0"})
 
 
 
@@ -78,7 +74,8 @@ def payments_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_plan_id": "plan_id IS NOT NULL "})
+@dlt.expect_all({"valid_plan_id": "plan_id IS NOT NULL","valid_deductible": "deductible > 0","valid_coinsurance": "coinsurance > 0",
+                 "valid_out_of_pocket_maximum": "out_of_pocket_maximum > 0","valid_daily_premium": "daily_premium > 0"})
 
 def plans_clean():
     plans_df = dlt.read('plans_raw')
@@ -101,7 +98,8 @@ def plans_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_policy": "policy_number IS NOT NULL "})
+@dlt.expect_all({"valid_policy": "policy_number IS NOT NULL" and "policy_start_date <= policy_end_date","valid_daily_premium": "daily_premium > 0",
+                 "valid_insurance_coverage": "insurance_coverage > 0"})
 
 def policies_clean():
     policies_df = dlt.read('policies_raw')
@@ -120,13 +118,11 @@ def policies_clean():
 @dlt.create_table(
   comment="The cleaned provider ",
   table_properties={
-    "weEnsure_deltaliv.quality": "silver",
+    "WeEnsure.quality": "silver",
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_provider": "provider_id IS NOT NULL "})
-# Expectation to warn if phone number != 10 digits
-@dlt.expect_all({"valid_phone_number":"LENGTH(phone) == 10"})
+@dlt.expect_all({"valid_provider": "provider_id IS NOT NULL ","valid_phone":"len(phone) =10"})
 
 def provider_clean():
     provider_df = dlt.read('provider_raw')
@@ -148,7 +144,7 @@ def provider_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_claim": "claim_number IS NOT NULL "})
+@dlt.expect_all({"valid_claim": "claim_number IS NOT NULL ","valid_amount_approved": "amount_approved >0"})
 
 def reimbursement_clean():
     reimbursement_df = dlt.read('reimbursement_raw')
@@ -163,23 +159,12 @@ def reimbursement_clean():
 
 # COMMAND ----------
 
-@dlt.create_table(
-  comment="The cleaned subscribers",
-  table_properties={
-    "WeEnsure.quality": "silver",
-    "pipelines.autoOptimize.managed": "true"
-  }
+@dlt.create_view(
+  comment="The cleaned subscribers"
 )
-@dlt.expect_all({
-    "valid_subscriber_id": "sub_id IS NOT NULL",
-    "valid_name": "name IS NOT NULL AND LENGTH(name) > 0",
-    "valid_phone": "phone IS NOT NULL AND LENGTH(phone) > 9",
-    "valid_mail": "mail LIKE '%@%'",
-    "valid_address": "address IS NOT NULL AND LENGTH(address) > 0",
-    "valid_sub_type": "sub_type IS NOT NULL"
-})
 
-def subscribers_clean():
+
+def subscribers_clean_view():
     subscribers_df = dlt.read('subscribers_raw')
     subscribers_df = subscribers_df.select([col(column).alias(column.lower()) for column in subscribers_df.columns])
     subscribers_df=subscribers_df.withColumn("mail", when(col("mail") == "-", None).otherwise(col("mail")))
@@ -188,6 +173,24 @@ def subscribers_clean():
     subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), ",", "/"))
     subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), "(\\d{11})([^/])", "$1/$2"))
     subscribers_df = subscribers_df.withColumn("phone", regexp_replace(col("phone"), r"/(\d{8})/", r"/022$1/"))
+    subscribers_df = subscribers_df.dropDuplicates()
+    return subscribers_df
+
+# COMMAND ----------
+
+@dlt.create_table(
+  comment="The cleaned subscribers and partitioned by sub_type",
+    partition_cols=["sub_type"],
+  table_properties={
+    "WeEnsure.quality": "silver",
+    "pipelines.autoOptimize.managed": "true"
+  }
+)
+@dlt.expect_all({"valid_subscriber": "sub_id IS NOT NULL ", "valid_phone":"len(phone) =10"})
+
+def subscribers_clean():
+    subscribers_df = dlt.read('subscribers_clean_view')
+    subscribers_df = subscribers_df.select([col(column).alias(column.lower()) for column in subscribers_df.columns])
     return subscribers_df
 
 # COMMAND ----------
@@ -205,13 +208,7 @@ def subscribers_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-
-@dlt.expect_all({
-    "valid_claim": "claim_number IS NOT NULL",
-    "valid_rejection_id": "rejection_id IS NOT NULL",
-    "valid_rejection_reason": "reason IS NOT NULL AND LENGTH(reason) > 0",
-    "valid_rejection_date": "rejection_date IS NOT NULL"
-})
+@dlt.expect_all({"valid_claim": "claim_number IS NOT NULL ","valid_rejection":"rejection_id IS NOT NULL"})
 
 def rejected_claims_clean():
     rejected_claims_df = dlt.read('rejected_claims_raw')
@@ -233,13 +230,7 @@ def rejected_claims_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({
-    "valid_agent_id": "agent_id IS NOT NULL",
-    "valid_name": "name IS NOT NULL",
-    "valid_email": "agent_email IS NOT NULL AND agent_email LIKE '%@%.%'",
-    "valid_address": "address IS NOT NULL",
-    "valid_phone": "phone IS NOT NULL AND LENGTH(phone) = 10 AND phone IS NUMERIC"
-})
+@dlt.expect_all({"valid_agent": "agent_id IS NOT NULL ", "valid_phone":"len(phone)=10"})
 
 def agents_clean():
     agents_df = dlt.read('agents_raw')
@@ -262,13 +253,9 @@ def agents_clean():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({
-    "valid_provider": "provider_id IS NOT NULL",
-    "valid_policy": "policy_number IS NOT NULL",
-    "valid_claim": "claim_number IS NOT NULL",
-    "claim_amount_bigger_than_zero": "amount_claimed > 0",
-    "valid_date_format": "TO_DATE(claim_date, 'MM/dd/yyyy') IS NOT NULL"
-})
+@dlt.expect_all({"valid_provider": "provider_id IS NOT NULL ","valid_policy": "policy_number IS NOT NULL ","valid_claim": "claim_number IS NOT NULL"
+                 ,"valid_amount_claimed": "amount_claimed >0"})
+
 def claims_clean():
     claims_df = dlt.read('claims_raw')
     claims_df = claims_df.select([col(column).alias(column.lower()) for column in claims_df.columns])

@@ -657,4 +657,8 @@ filtered_df.show()
 
 # COMMAND ----------
 
+display(agents)
+
+# COMMAND ----------
+
 
