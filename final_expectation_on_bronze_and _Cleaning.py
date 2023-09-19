@@ -283,7 +283,6 @@ table_properties={
 def customer_stream_clean():
     customer_df = dlt.read_stream('customer_stream_raw')
     customer_df = customer_df.select([col(column).alias(column.lower()) for column in customer_df.columns])
-    customer_df = customer_df.withColumn("EventProcessedUtcTime",date_format(from_utc_timestamp(col("EventProcessedUtcTime"), "UTC"), "yyyy-MM-dd HH:mm:ss")).withColumn("EventEnqueuedUtcTime",date_format(from_utc_timestamp(col("EventEnqueuedUtcTime"), "UTC"), "yyyy-MM-dd HH:mm:ss"))
 
     # customer_df.write.format('delta').mode("overwrite").save("/mnt/path")
 
