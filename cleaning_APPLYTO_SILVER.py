@@ -5,16 +5,16 @@ from pyspark.sql.types import *
 
 # COMMAND ----------
 
-customers=spark.read.table("capstone.customers_clean")
-agents=spark.read.table("capstone.agents_clean")
-claims=spark.read.table("capstone.claims_clean")
-policies=spark.read.table("capstone.policies_clean")
-provider=spark.read.table("capstone.provider_clean")
-rejected_claims=spark.read.table("capstone.rejected_claims_clean")
-subscribers=spark.read.table("capstone.subscribers_clean")
-plans=spark.read.table("capstone.plans_clean")
-reimbursement=spark.read.table("capstone.reimbursement_clean")
-payments=spark.read.table("capstone.payments_clean")
+customers=spark.read.table("capstone.customers_raw")
+agents=spark.read.table("capstone.agents_raw")
+claims=spark.read.table("capstone.claims_raw")
+policies=spark.read.table("capstone.policies_raw")
+provider=spark.read.table("capstone.provider_raw")
+rejected_claims=spark.read.table("capstone.rejected_claims_raw")
+subscribers=spark.read.table("capstone.subscribers_raw")
+plans=spark.read.table("capstone.plans_raw")
+reimbursement=spark.read.table("capstone.reimbursement_raw")
+payments=spark.read.table("capstone.payments_raw")
 
 # COMMAND ----------
 
@@ -105,17 +105,50 @@ customers.dtypes
 # COMMAND ----------
 
 def show_unique_values(dataframe: DataFrame, columns: list):
+    """
+    Display unique values in specified columns of a DataFrame.
+
+    Args:
+        dataframe (DataFrame): The DataFrame containing the data.
+        columns (list): A list of column names for which unique values should be displayed.
+
+    Returns:
+        None
+
+    This function takes a DataFrame and a list of column names, and for each column in the list,
+    it computes and displays the unique values present in that column.
+    """
     for column in columns:
         unique_values = dataframe.select(column).distinct()
         print(f"Unique values in {column}:")
         unique_values.show()
+
+# COMMAND ----------
 
 show_unique_values(customers, ["sex", "family_members"])
 
 # COMMAND ----------
 
 import re
+import re
+
 def extract_domain(email):
+    """
+    Extracts the domain from a given email address.
+
+    Args:
+        email (str): The email address from which to extract the domain.
+
+    Returns:
+        str: The extracted domain if a valid email address is provided, or "Invalid Email" if the email is invalid.
+
+    Example:
+        >>> extract_domain("user@example.com")
+        'example.com'
+
+        >>> extract_domain("invalid-email")
+        'Invalid Email'
+    """
     # Use a regular expression to extract the domain
     match = re.search(r"@([\w.-]+)", email)
     if match:
@@ -125,6 +158,9 @@ def extract_domain(email):
 
 # Register the function as a UDF (User-Defined Function)
 extract_domain_udf = udf(extract_domain, StringType())
+
+# COMMAND ----------
+
 
 # Apply the UDF to the DataFrame to create a new column "domain"
 df = customers.withColumn("domain", extract_domain_udf(customers["customers_email"]))
@@ -140,11 +176,27 @@ invalid_emails.show()
 # COMMAND ----------
 
 def is_valid_date(date_col):
+    """
+    Check if a date column is valid based on the 'yyyy-MM-dd' format.
+
+    Parameters:
+    date_col (pyspark.sql.Column): A PySpark DataFrame column representing dates in the 'yyyy-MM-dd' format.
+
+    Returns:
+    bool: True if the date column is valid, False otherwise.
+
+    Example:
+    >>> df = spark.createDataFrame([("2023-09-19",), ("2023-09-20",), ("2023-09-21",)], ["date"])
+    >>> is_valid_date(df["date"])
+    True
+    """
     try:
         date_format = "yyyy-MM-dd"
         return date_col.isNotNull()
     except ValueError:
         return False
+
+# COMMAND ----------
 
 # Add a new column "date_validation" to the DataFrame
 df = customers.withColumn("date_validation", is_valid_date(col("birthdate")))
@@ -166,6 +218,36 @@ invalid_dates_df.show()
 # COMMAND ----------
 
 def find_rows_with_missing_values(dataframe: DataFrame):
+    """
+    Find rows with missing values in a DataFrame.
+
+    Args:
+        dataframe (DataFrame): The input DataFrame to search for rows with missing values.
+
+    Returns:
+        DataFrame: A new DataFrame containing rows with missing values.
+
+    This function iterates through each row in the input DataFrame and checks each column for
+    missing values. It considers various patterns such as "null," "n/a," "na," "N/A," "NA," and "?"
+    as missing values. Rows with at least one missing value are added to the result DataFrame.
+    The result DataFrame is returned and also displayed using the `show()` method.
+
+    Example:
+    >>> from pyspark.sql import SparkSession
+    >>> spark = SparkSession.builder.appName("example").getOrCreate()
+    >>> data = [(1, "John", None), (2, "Alice", "N/A"), (3, "Bob", "hello")]
+    >>> columns = ["id", "name", "value"]
+    >>> df = spark.createDataFrame(data, columns)
+    >>> result = find_rows_with_missing_values(df)
+    >>> result.show()
+    +---+-----+-----+
+    | id| name|value|
+    +---+-----+-----+
+    |  1| John| null|
+    |  2|Alice|  N/A|
+    +---+-----+-----+
+    """
+    
     # Define the list of null or missing value patterns to check
     missing_value_patterns = ["null", "n/a", "na", "N/A", "NA", "?"]
     
@@ -185,6 +267,9 @@ def find_rows_with_missing_values(dataframe: DataFrame):
     result_dataframe = dataframe.sparkSession.createDataFrame(rows_with_missing_values, dataframe.schema)
     
     return result_dataframe.show()
+
+
+# COMMAND ----------
 
 find_rows_with_missing_values(payments)
 
@@ -248,6 +333,21 @@ display(policies)
 # COMMAND ----------
 
 def is_valid_date(date_col):
+    """
+    Check if a date column is valid based on the 'yyyy-MM-dd' format.
+
+    Parameters:
+    date_col (pyspark.sql.Column): A PySpark DataFrame column representing dates in the 'yyyy-MM-dd' format.
+
+    Returns:
+    bool: True if the date column is valid, False otherwise.
+
+    Example:
+    >>> df = spark.createDataFrame([("2023-09-19",), ("2023-09-20",), ("2023-09-21",)], ["date"])
+    >>> is_valid_date(df["date"])
+    True
+    """
+    
     try:
         date_format = "yyyy-MM-dd"
         return date_col.isNotNull()
@@ -308,6 +408,21 @@ filtered_df.show()
 # COMMAND ----------
 
 def is_valid_date(date_col):
+    """
+    Check if a date column is valid based on the 'yyyy-MM-dd' format.
+
+    Parameters:
+    date_col (pyspark.sql.Column): A PySpark DataFrame column representing dates in the 'yyyy-MM-dd' format.
+
+    Returns:
+    bool: True if the date column is valid, False otherwise.
+
+    Example:
+    >>> df = spark.createDataFrame([("2023-09-19",), ("2023-09-20",), ("2023-09-21",)], ["date"])
+    >>> is_valid_date(df["date"])
+    True
+    """
+    
     try:
         date_format = "yyyy-MM-dd"
         return date_col.isNotNull()
@@ -410,6 +525,21 @@ show_unique_values(rejected_claims, ["reason"])
 # COMMAND ----------
 
 def is_valid_date(date_col):
+    """
+    Check if a date column is valid based on the 'yyyy-MM-dd' format.
+
+    Parameters:
+    date_col (pyspark.sql.Column): A PySpark DataFrame column representing dates in the 'yyyy-MM-dd' format.
+
+    Returns:
+    bool: True if the date column is valid, False otherwise.
+
+    Example:
+    >>> df = spark.createDataFrame([("2023-09-19",), ("2023-09-20",), ("2023-09-21",)], ["date"])
+    >>> is_valid_date(df["date"])
+    True
+    """
+    
     try:
         date_format = "yyyy-MM-dd"
         return date_col.isNotNull()
@@ -440,20 +570,6 @@ display(agents)
 # COMMAND ----------
 
 #check for mail domains
-
-import re
-def extract_domain(email):
-    # Use a regular expression to extract the domain
-    match = re.search(r"@([\w.-]+)", email)
-    if match:
-        return match.group(1)
-    else:
-        return "Invalid Email"
-
-# Register the function as a UDF (User-Defined Function)
-extract_domain_udf = udf(extract_domain, StringType())
-
-# Apply the UDF to the DataFrame to create a new column "domain"
 df = agents.withColumn("domain", extract_domain_udf(agents["agent_email"]))
 
 # Get unique domain values
@@ -493,6 +609,21 @@ display(claims)
 # COMMAND ----------
 
 def is_valid_date(date_col):
+    """
+    Check if a date column is valid based on the 'yyyy-MM-dd' format.
+
+    Parameters:
+    date_col (pyspark.sql.Column): A PySpark DataFrame column representing dates in the 'yyyy-MM-dd' format.
+
+    Returns:
+    bool: True if the date column is valid, False otherwise.
+
+    Example:
+    >>> df = spark.createDataFrame([("2023-09-19",), ("2023-09-20",), ("2023-09-21",)], ["date"])
+    >>> is_valid_date(df["date"])
+    True
+    """
+    
     try:
         date_format = "yyyy-MM-dd"
         return date_col.isNotNull()
