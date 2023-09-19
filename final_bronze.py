@@ -17,7 +17,7 @@ import dlt
   }
 )
 def customers_raw():
-     """
+    """
     Load and create the Raw Customers Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -39,7 +39,7 @@ def customers_raw():
   }
 )
 def agents_raw():
-     """
+    """
     Load and create the Raw Agents Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -61,7 +61,7 @@ def agents_raw():
   }
 )
 def payments_raw():
-     """
+    """
     Load and create the Raw Payments Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -83,7 +83,7 @@ def payments_raw():
   }
 )
 def reimbursement_raw():
-     """
+    """
     Load and create the Raw Reimbursements Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -105,7 +105,7 @@ def reimbursement_raw():
   }
 )
 def provider_raw():
-     """
+    """
     Load and create the Raw Providers Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -127,7 +127,7 @@ def provider_raw():
   }
 )
 def claims_raw():
-     """
+    """
     Load and create the Raw Claims Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -150,7 +150,7 @@ def claims_raw():
   }
 )
 def plans_raw():
-     """
+    """
     Load and create the Raw Plans Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -172,7 +172,7 @@ def plans_raw():
   }
 )
 def policies_raw():
-     """
+    """
     Load and create the Raw Policies Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -195,7 +195,7 @@ def policies_raw():
   }
 )
 def rejected_claims_raw():
-     """
+    """
     Load and create the Raw Rejected Claims Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
@@ -217,7 +217,7 @@ def rejected_claims_raw():
   }
 )
 def subscribers_raw():
-     """
+    """
     Load and create the Raw Subscribers Delta Lake table.
 
     This function reads data from a CSV file, processes it, and stores it in a Delta Lake table.
