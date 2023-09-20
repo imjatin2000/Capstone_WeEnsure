@@ -350,6 +350,18 @@ def agents_clean():
 
 # COMMAND ----------
 
+@dlt.create_table(
+  comment="The cleaned claims and partitioned by provider_id",
+    partition_cols=["provider_id"],
+  table_properties={
+    "WeEnsure.quality": "silver",
+    "pipelines.autoOptimize.managed": "true"
+  }
+)
+@dlt.expect_all({"valid_provider": "provider_id IS NOT NULL ","valid_policy": "policy_number IS NOT NULL ","valid_claim": "claim_number IS NOT NULL"
+                 ,"valid_amount_claimed": "amount_claimed >0"})
+
+
 def claims_clean():
     """
     Cleans and processes the claims data, partitioning it by provider_id.
