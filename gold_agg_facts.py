@@ -79,6 +79,26 @@ def calculate_total_rejected_claims(claims_df, rejected_claims_df):
 )
 
 def providers_agg_facts():
+    """
+    Calculate aggregated facts about providers based on various data sources.
+
+    This function performs several data operations on provider-related data, including calculating
+    total profit, average settlement time, total reimburse claims, and total rejected claims. It
+    then aggregates these facts into a single DataFrame.
+
+    Returns:
+        DataFrame: A DataFrame containing aggregated facts about providers.
+
+    Raises:
+        None
+
+    Dependencies:
+        - dlt: Reading provider_clean data
+        - calculate_total_profit: A function to calculate total profit for providers.
+        - calculate_average_settlement_time: A function to calculate the average settlement time for claims.
+        - calculate_total_reimburse_claims: A function to calculate the total reimburse claims.
+        - calculate_total_rejected_claims: A function to calculate the total rejected claims.
+    """
     provider_df = dlt.read("provider_clean")
     claims_df = dlt.read("claims_clean")
     reimbursement_df = dlt.read("reimbursement_clean")
@@ -150,6 +170,25 @@ def calculate_renewing_customers(customers_df, policies_df):
 )
 
 def agents_agg_facts():
+    """
+    Calculate aggregated facts about agents based on various data sources.
+
+    This function performs several data operations on agent-related data, including calculating
+    the total number of policies sold per month, renewing customers, and total premium collected.
+    It then aggregates these facts into a single DataFrame.
+
+    Returns:
+        DataFrame: A DataFrame containing aggregated facts about agents.
+
+    Raises:
+        None
+
+    Dependencies:
+        - dlt: A library/module for reading data.
+        - calculate_policies_sold_per_month: A function to calculate the total policies sold per month.
+        - calculate_renewing_customers: A function to calculate renewing customers.
+        - calculate_total_premium_collected: A function to calculate the total premium collected.
+    """
     agents_df = dlt.read("agents_clean")
     policies_df=dlt.read("policies_clean")
     customers_df=dlt.read("customers_clean")
@@ -163,6 +202,11 @@ def agents_agg_facts():
         .join(total_polices_per_month_df, "agent_id", "left")
 
     return agents_facts
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # CUSTOMERS FACT 
 
 # COMMAND ----------
 
@@ -239,8 +283,6 @@ def claims_rejected(df):
 
 # COMMAND ----------
 
-# COMMAND ----------
-
 
 @dlt.create_table(
   comment="The aggregate customers facts",
@@ -251,9 +293,34 @@ def claims_rejected(df):
 )
 
 def customers_agg_facts():
-    customers_df = dlt.read("customers_clean")
-    policyRenewals_df = policy_renewals(customers_df)
+    """
+    Compute aggregated facts about customers based on various data sources.
 
+    This function performs several data operations on customer-related data, including policy renewals,
+    claim frequencies, premium-to-claim ratios, settlement days, reimbursement details, rejected claims,
+    and invalid claims. It then aggregates these facts into a single DataFrame.
+
+    Returns:
+        DataFrame: A DataFrame containing aggregated facts about customers.
+
+    Raises:
+        None
+
+    Dependencies:
+        - dlt: Reading customer_clean data
+        - policy_renewals: A function to calculate policy renewals.
+        - claim_freq: A function to calculate claim frequencies.
+        - prem_to_claim_ratio: A function to calculate premium-to-claim ratios.
+        - avg_settlement_days: A function to calculate average settlement days.
+        - reimb_to_claims: A function to calculate reimbursement-to-claims amounts.
+        - claims_rejected: A function to calculate total claims rejected.
+        - invalid_claims: A function to identify invalid claims.
+    """
+
+    customers_df = dlt.read("customers_clean")
+
+    policyRenewals_df = policy_renewals(customers_df)
+    
     policy_df = dlt.read("policies_clean")
     claims_df = dlt.read("claims_clean")
     policyXclaim = claims_df.join(policy_df,claims_df["policy_number"]==policy_df["policy_number"],"inner")
@@ -278,11 +345,6 @@ def customers_agg_facts():
     customers_agg_df = policyRenewals_df.join(claimFrequency_df,"customer_id","left").join(premiumToClaimRatio_df,"customer_id","left").join(AvgSettlementDays_df,"customer_id","left").join(reimbusementToClaimsAmount_df,"customer_id","left").join(TotalClaimsRejected_df,"customer_id","left").join(InvalidClaims_df,"customer_id","left")
     return customers_agg_df
 
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC select* from capstone.customers_agg_facts
 
 # COMMAND ----------
 
