@@ -256,7 +256,7 @@ def subscribers_clean_view():
     "pipelines.autoOptimize.managed": "true"
   }
 )
-@dlt.expect_all({"valid_subscriber": "sub_id IS NOT NULL ", "valid_phone":"len(phone)!=10"})
+@dlt.expect_all({"valid_subscriber": "sub_id IS NOT NULL ", "valid_phone":"len(phone)=10"})
 
 def subscribers_clean():
     """
