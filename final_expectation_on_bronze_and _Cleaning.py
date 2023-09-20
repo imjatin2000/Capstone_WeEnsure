@@ -248,6 +248,16 @@ def subscribers_clean_view():
 
 # COMMAND ----------
 
+@dlt.create_table(
+  comment="The cleaned subscribers and partitioned by sub_type",
+    partition_cols=["sub_type"],
+  table_properties={
+    "WeEnsure.quality": "silver",
+    "pipelines.autoOptimize.managed": "true"
+  }
+)
+@dlt.expect_all({"valid_subscriber": "sub_id IS NOT NULL ", "valid_phone":"len(phone)!=10"})
+
 def subscribers_clean():
     """
     Clean and process subscriber data.
