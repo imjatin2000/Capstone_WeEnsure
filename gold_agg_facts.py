@@ -283,6 +283,13 @@ def claims_rejected(df):
 
 # COMMAND ----------
 
+<<<<<<< Updated upstream
+=======
+
+
+# COMMAND ----------
+
+>>>>>>> Stashed changes
 
 @dlt.create_table(
   comment="The aggregate customers facts",
@@ -348,4 +355,133 @@ def customers_agg_facts():
 
 # COMMAND ----------
 
+<<<<<<< Updated upstream
+=======
+# MAGIC %sql
+# MAGIC select* from capstone.customers_agg_facts
 
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # STREAMING FACTS
+>>>>>>> Stashed changes
+
+# COMMAND ----------
+
+# Function to calculate daily metrics
+def calculate_daily_metrics(df):
+
+    """
+    Calculate daily metrics for a streaming DataFrame.
+
+    This function takes a streaming DataFrame 'df' containing health-related data
+    and calculates daily metrics for each customer. It extracts the date from the
+    'activity_timestamp' column and calculates average heart rate, total steps,
+    and total calories burned for each customer on a daily basis.
+
+    Parameters:
+    - df (DataFrame): The input streaming DataFrame containing health-related data.
+
+    Returns:
+    - DataFrame: A DataFrame with daily metrics for each customer, including columns:
+      - customer_id: The customer's unique identifier.
+      - avg_heart_rate: The average heart rate for the day.
+      - total_steps: The total number of steps taken during the day.
+      - total_calories_burned: The total calories burned during the day.
+
+    Notes:
+    - This function uses the 'activity_timestamp' column to extract the date and
+      group the data by customer and date.
+    - It calculates daily metrics with a watermark of 10 minutes for handling late
+      arriving data.
+    """
+    # Extract date from timestamp
+    df = df.withColumn("date", date_format(col("activity_timestamp"), "yyyy-MM-dd"))
+    
+    # Calculate daily metrics
+    daily_metrics = df.withWatermark("EventProcessedUtcTime", "10 minutes").groupBy("customer_id", "date").agg(
+        avg(col("heart_rate")).alias("avg_heart_rate"),
+        sum(col("total_steps")).alias("total_steps"),
+        sum(col("calories")).alias("total_calories_burned")
+    )\
+    .drop("date")
+    
+    return daily_metrics
+
+# COMMAND ----------
+
+@dlt.create_table(
+comment="The aggragate customers fact tables of the activity of customer like steps,heart rate",
+table_properties={
+    "WeEnsure.quality": "gold",
+    "pipelines.autoOptimize.managed": "true"
+}
+)
+
+def customer_stream_daily_agg_facts():
+    customer_stream = dlt.read_stream('customer_stream_clean')
+    daily_metrics=calculate_daily_metrics(customer_stream)
+   
+    # merged_results.write.format('delta').mode("overwrite").save("/mnt/path")
+
+    return daily_metrics
+
+# COMMAND ----------
+
+def calculate_weekly_metrics(df):
+    """
+    Calculate weekly metrics for a streaming DataFrame.
+
+    This function takes a streaming DataFrame 'df' containing health-related data
+    and calculates weekly metrics for each customer. It extracts the date from the
+    'activity_timestamp' column and calculates average heart rate, total steps,
+    and total calories burned for each customer on a weekly basis.
+
+    Parameters:
+    - df (DataFrame): The input streaming DataFrame containing health-related data.
+
+    Returns:
+    - DataFrame: A DataFrame with weekly metrics for each customer, including columns:
+      - customer_id: The customer's unique identifier.
+      - week_start_date: The start date of the week.
+      - avg_heart_rate: The average heart rate for the week.
+      - total_steps: The total number of steps taken during the week.
+      - total_calories_burned: The total calories burned during the week.
+
+    Notes:
+    - This function uses the 'activity_timestamp' column to extract the date and
+      group the data by customer and the start date of each week.
+    - It calculates weekly metrics with a watermark of 10 minutes for handling late
+      arriving data.
+    """
+    # Extract the start date of the week from the timestamp
+    df = df.withColumn("week_start_date", date_format(date_trunc("week", col("activity_timestamp")), "yyyy-MM-dd"))
+    
+    # Calculate weekly metrics
+    weekly_metrics = df.withWatermark("EventProcessedUtcTime", "10 minutes").groupBy("customer_id", "week_start_date").agg(
+        avg(col("heart_rate")).alias("avg_heart_rate"),
+        sum(col("total_steps")).alias("total_steps"),
+        sum(col("calories")).alias("total_calories_burned")
+    )\
+    .drop("week_start_date")
+    
+    return weekly_metrics
+
+
+# COMMAND ----------
+
+@dlt.create_table(
+comment="The aggragate customers fact tables of the activity of customer like steps,heart rate",
+table_properties={
+    "WeEnsure.quality": "gold",
+    "pipelines.autoOptimize.managed": "true"
+}
+)
+
+def customer_stream_weekly_agg_facts():
+    customer_stream = dlt.read_stream('customer_stream_clean')
+    weekly_metrics=calculate_weekly_metrics(customer_stream)
+   
+    # merged_results.write.format('delta').mode("overwrite").save("/mnt/path")
+
+    return weekly_metrics
