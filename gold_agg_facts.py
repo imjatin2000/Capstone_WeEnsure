@@ -283,13 +283,7 @@ def claims_rejected(df):
 
 # COMMAND ----------
 
-<<<<<<< Updated upstream
-=======
 
-
-# COMMAND ----------
-
->>>>>>> Stashed changes
 
 @dlt.create_table(
   comment="The aggregate customers facts",
@@ -355,16 +349,8 @@ def customers_agg_facts():
 
 # COMMAND ----------
 
-<<<<<<< Updated upstream
-=======
-# MAGIC %sql
-# MAGIC select* from capstone.customers_agg_facts
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # STREAMING FACTS
->>>>>>> Stashed changes
 
 # COMMAND ----------
 
