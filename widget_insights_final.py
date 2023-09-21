@@ -5,16 +5,16 @@ import dlt
 
 # COMMAND ----------
 
-agents_df = spark.read.format("delta").table("capstone.agents_clean")
-claims_df = spark.read.format("delta").table("capstone.claims_clean")
-customers_df = spark.read.format("delta").table("capstone.customers_clean")
-payments_df = spark.read.format("delta").table("capstone.payments_clean")
-plans_df = spark.read.format("delta").table("capstone.plans_clean")
-policies_df = spark.read.format("delta").table("capstone.policies_clean")
-provider_df = spark.read.format("delta").table("capstone.provider_clean")
-reimbursements_df = spark.read.format("delta").table("capstone.reimbursement_clean")
-rejected_claims_df = spark.read.format("delta").table("capstone.rejected_claims_clean")
-subscribers_df = spark.read.format("delta").table("capstone.subscribers_clean")
+agents_df = spark.read.format("delta").table("weensure.capstone.agents_clean")
+claims_df = spark.read.format("delta").table("weensure.capstone.claims_clean")
+customers_df = spark.read.format("delta").table("weensure.capstone.customers_clean")
+payments_df = spark.read.format("delta").table("weensure.capstone.payments_clean")
+plans_df = spark.read.format("delta").table("weensure.capstone.plans_clean")
+policies_df = spark.read.format("delta").table("weensure.capstone.policies_clean")
+provider_df = spark.read.format("delta").table("weensure.capstone.provider_clean")
+reimbursements_df = spark.read.format("delta").table("weensure.capstone.reimbursement_clean")
+rejected_claims_df = spark.read.format("delta").table("weensure.capstone.rejected_claims_clean")
+subscribers_df = spark.read.format("delta").table("weensure.capstone.subscribers_clean")
 
 # COMMAND ----------
 
@@ -70,9 +70,9 @@ display(subscribers_df)
 
 # MAGIC %sql
 # MAGIC SELECT a.agent_id, a.name AS agent_name, SUM(p.daily_premium) AS total_premium_generated
-# MAGIC FROM capstone.agents_clean a
-# MAGIC LEFT JOIN capstone.customers_clean c ON a.agent_id = c.agent_id
-# MAGIC LEFT JOIN capstone.policies_clean p ON c.customer_id = p.customer_id
+# MAGIC FROM agents_clean a
+# MAGIC LEFT JOIN customers_clean c ON a.agent_id = c.agent_id
+# MAGIC LEFT JOIN policies_clean p ON c.customer_id = p.customer_id
 # MAGIC GROUP BY a.agent_id, a.name
 # MAGIC ORDER BY total_premium_generated $sort_order
 
@@ -86,9 +86,9 @@ display(subscribers_df)
 
 # MAGIC %sql
 # MAGIC SELECT a.agent_id, a.name AS agent_name, SUM(p.daily_premium) AS total_premium_generated
-# MAGIC FROM capstone.agents_clean a
-# MAGIC LEFT JOIN capstone.customers_clean c ON a.agent_id = c.agent_id
-# MAGIC LEFT JOIN capstone.policies_clean p ON c.customer_id = p.customer_id
+# MAGIC FROM agents_clean a
+# MAGIC LEFT JOIN customers_clean c ON a.agent_id = c.agent_id
+# MAGIC LEFT JOIN policies_clean p ON c.customer_id = p.customer_id
 # MAGIC where  a.agent_id = "$agent_id"
 # MAGIC GROUP BY a.agent_id, a.name
 # MAGIC
@@ -209,8 +209,8 @@ display(result)
 
 # MAGIC %sql
 # MAGIC SELECT Pl.plan_id, round(AVG(DATEDIFF(P.policy_end_date, P.policy_start_date)),2) AS avg_policy_duration_new
-# MAGIC FROM capstone.Policies_clean P
-# MAGIC LEFT JOIN capstone.Plans_clean Pl ON P.plan_id = Pl.plan_id
+# MAGIC FROM Policies_clean P
+# MAGIC LEFT JOIN Plans_clean Pl ON P.plan_id = Pl.plan_id
 # MAGIC where Pl.plan_id="$plan_id"
 # MAGIC GROUP BY Pl.plan_id;
 
@@ -422,10 +422,10 @@ display(reimbursements_df)
 
 # MAGIC %sql
 # MAGIC SELECT cu.customer_id, cu.customer_name, round(SUM(r.amount_approved),2) AS total_reimbursement_amount
-# MAGIC FROM capstone.customers_clean cu
-# MAGIC JOIN capstone.Policies_clean po ON cu.customer_id = po.customer_id
-# MAGIC JOIN capstone.claims_clean c ON po.policy_number = c.policy_number
-# MAGIC JOIN capstone.Reimbursement_clean r ON c.claim_number = r.claim_number
+# MAGIC FROM customers_clean cu
+# MAGIC JOIN Policies_clean po ON cu.customer_id = po.customer_id
+# MAGIC JOIN claims_clean c ON po.policy_number = c.policy_number
+# MAGIC JOIN Reimbursement_clean r ON c.claim_number = r.claim_number
 # MAGIC GROUP BY cu.customer_id, cu.customer_name
 # MAGIC ORDER BY total_reimbursement_amount $sort_order;
 
@@ -438,10 +438,10 @@ display(reimbursements_df)
 
 # MAGIC %sql
 # MAGIC SELECT cu.customer_id, cu.customer_name, round(SUM(r.amount_approved),2) AS total_reimbursement_amount
-# MAGIC FROM capstone.customers_clean cu
-# MAGIC JOIN capstone.Policies_clean po ON cu.customer_id = po.customer_id
-# MAGIC JOIN capstone.claims_clean c ON po.policy_number = c.policy_number
-# MAGIC JOIN capstone.Reimbursement_clean r ON c.claim_number = r.claim_number
+# MAGIC FROM customers_clean cu
+# MAGIC JOIN Policies_clean po ON cu.customer_id = po.customer_id
+# MAGIC JOIN claims_clean c ON po.policy_number = c.policy_number
+# MAGIC JOIN Reimbursement_clean r ON c.claim_number = r.claim_number
 # MAGIC where cu.customer_id="$customer_id"
 # MAGIC GROUP BY cu.customer_id, cu.customer_name
 # MAGIC ;
@@ -491,8 +491,8 @@ dbutils.widgets.dropdown("selected_treatment", "Inpatient_Care", [
 
 # MAGIC %sql
 # MAGIC SELECT c.treatment, COUNT(c.treatment) AS claims_approved
-# MAGIC FROM capstone.Reimbursement_clean r
-# MAGIC JOIN capstone.claims_clean c ON c.claim_number = r.claim_number
+# MAGIC FROM Reimbursement_clean r
+# MAGIC JOIN claims_clean c ON c.claim_number = r.claim_number
 # MAGIC WHERE c.treatment = '${selected_treatment}'
 # MAGIC GROUP BY c.treatment
 
