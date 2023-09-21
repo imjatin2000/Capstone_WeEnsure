@@ -1,5 +1,5 @@
 -- Databricks notebook source
-select * from capstone.agents_clean
+select * from weensure.capstone.agents_clean
 
 -- COMMAND ----------
 
@@ -9,19 +9,19 @@ select * from capstone.agents_clean
 -- COMMAND ----------
 
 SELECT
-    YEAR(CAST(capstone.reimbursement_clean.reimbursement_date AS DATE)) AS year,
-    ROUND(SUM(CASE WHEN capstone.claims_clean.treatment = 'Inpatient_Care' THEN capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS inpatient_care,
-    ROUND(SUM(CASE WHEN capstone.claims_clean.treatment = 'Outpatient_Care' THEN capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS outpatient_care,
-    ROUND(SUM(CASE WHEN capstone.claims_clean.treatment = 'Prescription_Drugs' THEN capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS prescription_drugs,
-    ROUND(SUM(CASE WHEN capstone.claims_clean.treatment = 'Mental_Health_Care' THEN capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS mental_health_care,
-    ROUND(SUM(CASE WHEN capstone.claims_clean.treatment = 'Dental_Care' THEN capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS dental_care,
-    ROUND(SUM(CASE WHEN capstone.claims_clean.treatment = 'Vision_Care' THEN capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS vision_care
+    YEAR(CAST(weensure.capstone.reimbursement_clean.reimbursement_date AS DATE)) AS year,
+    ROUND(SUM(CASE WHEN weensure.capstone.claims_clean.treatment = 'Inpatient_Care' THEN weensure.capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS inpatient_care,
+    ROUND(SUM(CASE WHEN weensure.capstone.claims_clean.treatment = 'Outpatient_Care' THEN weensure.capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS outpatient_care,
+    ROUND(SUM(CASE WHEN weensure.capstone.claims_clean.treatment = 'Prescription_Drugs' THEN weensure.capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS prescription_drugs,
+    ROUND(SUM(CASE WHEN weensure.capstone.claims_clean.treatment = 'Mental_Health_Care' THEN weensure.capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS mental_health_care,
+    ROUND(SUM(CASE WHEN weensure.capstone.claims_clean.treatment = 'Dental_Care' THEN weensure.capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS dental_care,
+    ROUND(SUM(CASE WHEN weensure.capstone.claims_clean.treatment = 'Vision_Care' THEN weensure.capstone.reimbursement_clean.amount_approved ELSE 0 END), 2) AS vision_care
 FROM
-    capstone.claims_clean
+    weensure.capstone.claims_clean
 JOIN
-    capstone.reimbursement_clean ON capstone.claims_clean.claim_number = capstone.reimbursement_clean.claim_number
+    weensure.capstone.reimbursement_clean ON weensure.capstone.claims_clean.claim_number = weensure.capstone.reimbursement_clean.claim_number
 WHERE
-    YEAR(CAST(capstone.reimbursement_clean.reimbursement_date AS DATE)) BETWEEN 2018 AND 2022
+    YEAR(CAST(weensure.capstone.reimbursement_clean.reimbursement_date AS DATE)) BETWEEN 2018 AND 2022
 GROUP BY
     year
 ORDER BY
@@ -37,13 +37,13 @@ ORDER BY
 
 WITH PlanSales AS (
     SELECT
-        YEAR(CAST(capstone.policies_clean.policy_start_date AS DATE)) AS year,
-        capstone.policies_clean.plan_id,
+        YEAR(CAST(weensure.capstone.policies_clean.policy_start_date AS DATE)) AS year,
+        weensure.capstone.policies_clean.plan_id,
         COUNT(*) AS plan_sales_count
     FROM
-        capstone.policies_clean
+        weensure.capstone.policies_clean
     GROUP BY
-        year, capstone.policies_clean.plan_id
+        year, weensure.capstone.policies_clean.plan_id
 ),
 RankedPlans AS (
     SELECT
@@ -82,11 +82,11 @@ WITH ProviderReimbursements AS (
         p.provider_name,
         r.amount_approved
     FROM
-        capstone.reimbursement_clean r
+        weensure.capstone.reimbursement_clean r
     JOIN
-        capstone.claims_clean c ON r.claim_number = c.claim_number
+        weensure.capstone.claims_clean c ON r.claim_number = c.claim_number
     JOIN
-        capstone.provider_clean p ON c.provider_id = p.provider_id
+        weensure.capstone.provider_clean p ON c.provider_id = p.provider_id
 )
 SELECT
     provider_name,
@@ -113,11 +113,11 @@ WITH AgentPolicyCount AS (
         a.name AS agent_name,
         COUNT(DISTINCT p.policy_number) AS policy_count
     FROM
-        capstone.agents_clean a
+        weensure.capstone.agents_clean a
     JOIN
-        capstone.customers_clean c ON a.agent_id = c.agent_id
+        weensure.capstone.customers_clean c ON a.agent_id = c.agent_id
     JOIN
-        capstone.policies_clean p ON c.customer_id = p.customer_id
+        weensure.capstone.policies_clean p ON c.customer_id = p.customer_id
     GROUP BY
         a.agent_id, a.name
 )
@@ -144,11 +144,11 @@ WITH SubscriberPolicyCount AS (
         s.name AS subscriber_name,
         COUNT(p.policy_number) AS policy_count
     FROM
-        capstone.subscribers_clean s
+        weensure.capstone.subscribers_clean s
     JOIN
-        capstone.customers_clean c ON s.sub_id = c.sub_id
+        weensure.capstone.customers_clean c ON s.sub_id = c.sub_id
     JOIN
-        capstone.policies_clean p ON c.customer_id = p.customer_id
+        weensure.capstone.policies_clean p ON c.customer_id = p.customer_id
     GROUP BY
         s.sub_id, s.name
 )
@@ -177,11 +177,11 @@ WITH CustomerClaimCount AS (
         c.customer_name,
         COUNT(cl.claim_number) AS claim_count
     FROM
-        capstone.customers_clean c
+        weensure.capstone.customers_clean c
     RIGHT JOIN
-        capstone.policies_clean p ON c.customer_id = p.customer_id
+        weensure.capstone.policies_clean p ON c.customer_id = p.customer_id
     RIGHT JOIN
-        capstone.claims_clean cl ON p.policy_number = cl.policy_number
+        weensure.capstone.claims_clean cl ON p.policy_number = cl.policy_number
     GROUP BY
         c.customer_id, c.customer_name
 )
@@ -210,13 +210,13 @@ WITH CustomerReimbursementTotal AS (
         c.customer_name,
         SUM(r.amount_approved) AS total_reimbursement_amount
     FROM
-        capstone.customers_clean c
+        weensure.capstone.customers_clean c
     JOIN
-        capstone.policies_clean p ON c.customer_id = p.customer_id
+        weensure.capstone.policies_clean p ON c.customer_id = p.customer_id
     JOIN
-        capstone.claims_clean cl ON p.policy_number = cl.policy_number
+        weensure.capstone.claims_clean cl ON p.policy_number = cl.policy_number
     JOIN
-        capstone.reimbursement_clean r ON cl.claim_number = r.claim_number
+        weensure.capstone.reimbursement_clean r ON cl.claim_number = r.claim_number
     GROUP BY
         c.customer_id, c.customer_name
 )
@@ -244,15 +244,15 @@ WITH AgentRejectedClaims AS (
         a.name,
         COUNT(*) AS rejected_claim_count
     FROM
-        capstone.agents_clean a
+        weensure.capstone.agents_clean a
     JOIN
-        capstone.customers_clean c ON a.agent_id = c.agent_id
+        weensure.capstone.customers_clean c ON a.agent_id = c.agent_id
     JOIN
-        capstone.policies_clean p ON c.customer_id = p.customer_id
+        weensure.capstone.policies_clean p ON c.customer_id = p.customer_id
     JOIN
-        capstone.claims_clean cl ON p.policy_number = cl.policy_number
+        weensure.capstone.claims_clean cl ON p.policy_number = cl.policy_number
     JOIN
-        capstone.rejected_claims_clean rc ON cl.claim_number = rc.claim_number
+        weensure.capstone.rejected_claims_clean rc ON cl.claim_number = rc.claim_number
     GROUP BY
         a.agent_id, a.name
 )

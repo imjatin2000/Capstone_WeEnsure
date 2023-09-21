@@ -405,7 +405,7 @@ table_properties={
 )
 
 def customer_stream_daily_agg_facts():
-    customer_stream = dlt.read_stream('customer_stream_clean')
+    customer_stream = dlt.read('customer_stream_clean')
     daily_metrics=calculate_daily_metrics(customer_stream)
    
     # merged_results.write.format('delta').mode("overwrite").save("/mnt/path")
@@ -465,7 +465,7 @@ table_properties={
 )
 
 def customer_stream_weekly_agg_facts():
-    customer_stream = dlt.read_stream('customer_stream_clean')
+    customer_stream = dlt.read('customer_stream_clean')
     weekly_metrics=calculate_weekly_metrics(customer_stream)
    
     # merged_results.write.format('delta').mode("overwrite").save("/mnt/path")

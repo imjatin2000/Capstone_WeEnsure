@@ -232,7 +232,7 @@ def subscribers_raw():
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC streaming
+# MAGIC # streaming
 
 # COMMAND ----------
 
