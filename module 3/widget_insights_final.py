@@ -5,16 +5,16 @@ import dlt
 
 # COMMAND ----------
 
-agents_df = spark.read.format("delta").table("capstone.agents_clean")
-claims_df = spark.read.format("delta").table("capstone.claims_clean")
-customers_df = spark.read.format("delta").table("capstone.customers_clean")
-payments_df = spark.read.format("delta").table("capstone.payments_clean")
-plans_df = spark.read.format("delta").table("capstone.plans_clean")
-policies_df = spark.read.format("delta").table("capstone.policies_clean")
-provider_df = spark.read.format("delta").table("capstone.provider_clean")
-reimbursements_df = spark.read.format("delta").table("capstone.reimbursement_clean")
-rejected_claims_df = spark.read.format("delta").table("capstone.rejected_claims_clean")
-subscribers_df = spark.read.format("delta").table("capstone.subscribers_clean")
+agents_df = spark.read.format("delta").table("weensure.capstone.agents_clean")
+claims_df = spark.read.format("delta").table("weensure.capstone.claims_clean")
+customers_df = spark.read.format("delta").table("weensure.capstone.customers_clean")
+payments_df = spark.read.format("delta").table("weensure.capstone.payments_clean")
+plans_df = spark.read.format("delta").table("weensure.capstone.plans_clean")
+policies_df = spark.read.format("delta").table("weensure.capstone.policies_clean")
+provider_df = spark.read.format("delta").table("weensure.capstone.provider_clean")
+reimbursements_df = spark.read.format("delta").table("weensure.capstone.reimbursement_clean")
+rejected_claims_df = spark.read.format("delta").table("weensure.capstone.rejected_claims_clean")
+subscribers_df = spark.read.format("delta").table("weensure.capstone.subscribers_clean")
 
 # COMMAND ----------
 
@@ -46,7 +46,7 @@ display(subscribers_df)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN agent_id DEFAULT "AGENT_0009" CHOICES SELECT DISTINCT agent_id FROM agents_clean;
+# MAGIC CREATE WIDGET COMBOBOX agent_id DEFAULT "AGENT_0009" CHOICES SELECT DISTINCT agent_id FROM agents_clean;
 
 # COMMAND ----------
 
@@ -70,9 +70,9 @@ display(subscribers_df)
 
 # MAGIC %sql
 # MAGIC SELECT a.agent_id, a.name AS agent_name, SUM(p.daily_premium) AS total_premium_generated
-# MAGIC FROM capstone.agents_clean a
-# MAGIC LEFT JOIN capstone.customers_clean c ON a.agent_id = c.agent_id
-# MAGIC LEFT JOIN capstone.policies_clean p ON c.customer_id = p.customer_id
+# MAGIC FROM agents_clean a
+# MAGIC LEFT JOIN customers_clean c ON a.agent_id = c.agent_id
+# MAGIC LEFT JOIN policies_clean p ON c.customer_id = p.customer_id
 # MAGIC GROUP BY a.agent_id, a.name
 # MAGIC ORDER BY total_premium_generated $sort_order
 
@@ -86,9 +86,9 @@ display(subscribers_df)
 
 # MAGIC %sql
 # MAGIC SELECT a.agent_id, a.name AS agent_name, SUM(p.daily_premium) AS total_premium_generated
-# MAGIC FROM capstone.agents_clean a
-# MAGIC LEFT JOIN capstone.customers_clean c ON a.agent_id = c.agent_id
-# MAGIC LEFT JOIN capstone.policies_clean p ON c.customer_id = p.customer_id
+# MAGIC FROM agents_clean a
+# MAGIC LEFT JOIN customers_clean c ON a.agent_id = c.agent_id
+# MAGIC LEFT JOIN policies_clean p ON c.customer_id = p.customer_id
 # MAGIC where  a.agent_id = "$agent_id"
 # MAGIC GROUP BY a.agent_id, a.name
 # MAGIC
@@ -137,14 +137,14 @@ print(f"The agent who worked with least customers: {worst_agent_value}")
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT policies_clean.plan_id,
-# MAGIC     ROUND(AVG(plans_clean.daily_premium), $rounding_precision) AS avg_premium,
-# MAGIC     ROUND(AVG(insurance_coverage), $rounding_precision) AS avg_insurance_coverage
-# MAGIC FROM policies_clean
-# MAGIC JOIN plans_clean ON policies_clean.plan_id =plans_clean.plan_id
-# MAGIC GROUP BY 1
-# MAGIC ORDER BY avg_premium $sort_order
+# %sql
+# SELECT policies_clean.plan_id,
+#     ROUND(AVG(plans_clean.daily_premium), $rounding_precision) AS avg_premium,
+#     ROUND(AVG(insurance_coverage), $rounding_precision) AS avg_insurance_coverage
+# FROM policies_clean
+# JOIN plans_clean ON policies_clean.plan_id =plans_clean.plan_id
+# GROUP BY 1
+# ORDER BY avg_premium $sort_order
 
 # COMMAND ----------
 
@@ -179,7 +179,7 @@ display(result)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN plan_id DEFAULT "PLAN-0008" CHOICES SELECT DISTINCT plan_id FROM plans_clean;
+# MAGIC CREATE WIDGET COMBOBOX plan_id DEFAULT "PLAN-0008" CHOICES SELECT DISTINCT plan_id FROM plans_clean;
 # MAGIC
 # MAGIC -- Your SQL query for plan comparison here
 # MAGIC SELECT *
@@ -209,8 +209,8 @@ display(result)
 
 # MAGIC %sql
 # MAGIC SELECT Pl.plan_id, round(AVG(DATEDIFF(P.policy_end_date, P.policy_start_date)),2) AS avg_policy_duration_new
-# MAGIC FROM capstone.Policies_clean P
-# MAGIC LEFT JOIN capstone.Plans_clean Pl ON P.plan_id = Pl.plan_id
+# MAGIC FROM Policies_clean P
+# MAGIC LEFT JOIN Plans_clean Pl ON P.plan_id = Pl.plan_id
 # MAGIC where Pl.plan_id="$plan_id"
 # MAGIC GROUP BY Pl.plan_id;
 
@@ -239,7 +239,7 @@ display(payments_df)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN policy_number DEFAULT "Policy-00033" CHOICES SELECT  policy_number FROM policies_clean Limit 1023;
+# MAGIC CREATE WIDGET COMBOBOX policy_number DEFAULT "Policy-00033" CHOICES SELECT  policy_number FROM policies_clean Limit 1023;
 
 # COMMAND ----------
 
@@ -251,7 +251,7 @@ display(payments_df)
 # MAGIC %sql
 # MAGIC SELECT transaction_date, paid_amount
 # MAGIC FROM payments_clean
-# MAGIC WHERE policy_number = getArgument("policy_number")
+# MAGIC WHERE policy_number = "$policy_number"
 # MAGIC ORDER BY transaction_date;
 
 # COMMAND ----------
@@ -284,7 +284,7 @@ display(payments_df)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN customer_id DEFAULT "CUST_0005" CHOICES SELECT DISTINCT customer_id FROM Customers_clean LIMIT 1023;
+# MAGIC CREATE WIDGET COMBOBOX customer_id DEFAULT "CUST_0005" CHOICES SELECT DISTINCT customer_id FROM Customers_clean LIMIT 1023;
 # MAGIC
 
 # COMMAND ----------
@@ -382,7 +382,7 @@ display(provider_df)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN provider_id DEFAULT "Provider_00059" CHOICES SELECT DISTINCT provider_id FROM provider_clean;
+# MAGIC CREATE WIDGET COMBOBOX provider_id DEFAULT "Provider_00059" CHOICES SELECT DISTINCT provider_id FROM provider_clean;
 
 # COMMAND ----------
 
@@ -422,10 +422,10 @@ display(reimbursements_df)
 
 # MAGIC %sql
 # MAGIC SELECT cu.customer_id, cu.customer_name, round(SUM(r.amount_approved),2) AS total_reimbursement_amount
-# MAGIC FROM capstone.customers_clean cu
-# MAGIC JOIN capstone.Policies_clean po ON cu.customer_id = po.customer_id
-# MAGIC JOIN capstone.claims_clean c ON po.policy_number = c.policy_number
-# MAGIC JOIN capstone.Reimbursement_clean r ON c.claim_number = r.claim_number
+# MAGIC FROM customers_clean cu
+# MAGIC JOIN Policies_clean po ON cu.customer_id = po.customer_id
+# MAGIC JOIN claims_clean c ON po.policy_number = c.policy_number
+# MAGIC JOIN Reimbursement_clean r ON c.claim_number = r.claim_number
 # MAGIC GROUP BY cu.customer_id, cu.customer_name
 # MAGIC ORDER BY total_reimbursement_amount $sort_order;
 
@@ -438,10 +438,10 @@ display(reimbursements_df)
 
 # MAGIC %sql
 # MAGIC SELECT cu.customer_id, cu.customer_name, round(SUM(r.amount_approved),2) AS total_reimbursement_amount
-# MAGIC FROM capstone.customers_clean cu
-# MAGIC JOIN capstone.Policies_clean po ON cu.customer_id = po.customer_id
-# MAGIC JOIN capstone.claims_clean c ON po.policy_number = c.policy_number
-# MAGIC JOIN capstone.Reimbursement_clean r ON c.claim_number = r.claim_number
+# MAGIC FROM customers_clean cu
+# MAGIC JOIN Policies_clean po ON cu.customer_id = po.customer_id
+# MAGIC JOIN claims_clean c ON po.policy_number = c.policy_number
+# MAGIC JOIN Reimbursement_clean r ON c.claim_number = r.claim_number
 # MAGIC where cu.customer_id="$customer_id"
 # MAGIC GROUP BY cu.customer_id, cu.customer_name
 # MAGIC ;
@@ -491,8 +491,8 @@ dbutils.widgets.dropdown("selected_treatment", "Inpatient_Care", [
 
 # MAGIC %sql
 # MAGIC SELECT c.treatment, COUNT(c.treatment) AS claims_approved
-# MAGIC FROM capstone.Reimbursement_clean r
-# MAGIC JOIN capstone.claims_clean c ON c.claim_number = r.claim_number
+# MAGIC FROM Reimbursement_clean r
+# MAGIC JOIN claims_clean c ON c.claim_number = r.claim_number
 # MAGIC WHERE c.treatment = '${selected_treatment}'
 # MAGIC GROUP BY c.treatment
 
