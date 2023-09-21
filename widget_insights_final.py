@@ -137,14 +137,14 @@ print(f"The agent who worked with least customers: {worst_agent_value}")
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT policies_clean.plan_id,
-# MAGIC     ROUND(AVG(plans_clean.daily_premium), $rounding_precision) AS avg_premium,
-# MAGIC     ROUND(AVG(insurance_coverage), $rounding_precision) AS avg_insurance_coverage
-# MAGIC FROM policies_clean
-# MAGIC JOIN plans_clean ON policies_clean.plan_id =plans_clean.plan_id
-# MAGIC GROUP BY 1
-# MAGIC ORDER BY avg_premium $sort_order
+# %sql
+# SELECT policies_clean.plan_id,
+#     ROUND(AVG(plans_clean.daily_premium), $rounding_precision) AS avg_premium,
+#     ROUND(AVG(insurance_coverage), $rounding_precision) AS avg_insurance_coverage
+# FROM policies_clean
+# JOIN plans_clean ON policies_clean.plan_id =plans_clean.plan_id
+# GROUP BY 1
+# ORDER BY avg_premium $sort_order
 
 # COMMAND ----------
 
