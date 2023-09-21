@@ -251,7 +251,7 @@ display(payments_df)
 # MAGIC %sql
 # MAGIC SELECT transaction_date, paid_amount
 # MAGIC FROM payments_clean
-# MAGIC WHERE policy_number = getArgument("policy_number")
+# MAGIC WHERE policy_number = "$policy_number"
 # MAGIC ORDER BY transaction_date;
 
 # COMMAND ----------
