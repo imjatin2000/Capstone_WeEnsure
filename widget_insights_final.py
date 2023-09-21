@@ -46,7 +46,7 @@ display(subscribers_df)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN agent_id DEFAULT "AGENT_0009" CHOICES SELECT DISTINCT agent_id FROM agents_clean;
+# MAGIC CREATE WIDGET COMBOBOX agent_id DEFAULT "AGENT_0009" CHOICES SELECT DISTINCT agent_id FROM agents_clean;
 
 # COMMAND ----------
 
@@ -179,7 +179,7 @@ display(result)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN plan_id DEFAULT "PLAN-0008" CHOICES SELECT DISTINCT plan_id FROM plans_clean;
+# MAGIC CREATE WIDGET COMBOBOX plan_id DEFAULT "PLAN-0008" CHOICES SELECT DISTINCT plan_id FROM plans_clean;
 # MAGIC
 # MAGIC -- Your SQL query for plan comparison here
 # MAGIC SELECT *
@@ -239,7 +239,7 @@ display(payments_df)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN policy_number DEFAULT "Policy-00033" CHOICES SELECT  policy_number FROM policies_clean Limit 1023;
+# MAGIC CREATE WIDGET COMBOBOX policy_number DEFAULT "Policy-00033" CHOICES SELECT  policy_number FROM policies_clean Limit 1023;
 
 # COMMAND ----------
 
@@ -284,7 +284,7 @@ display(payments_df)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN customer_id DEFAULT "CUST_0005" CHOICES SELECT DISTINCT customer_id FROM Customers_clean LIMIT 1023;
+# MAGIC CREATE WIDGET COMBOBOX customer_id DEFAULT "CUST_0005" CHOICES SELECT DISTINCT customer_id FROM Customers_clean LIMIT 1023;
 # MAGIC
 
 # COMMAND ----------
@@ -382,7 +382,7 @@ display(provider_df)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET DROPDOWN provider_id DEFAULT "Provider_00059" CHOICES SELECT DISTINCT provider_id FROM provider_clean;
+# MAGIC CREATE WIDGET COMBOBOX provider_id DEFAULT "Provider_00059" CHOICES SELECT DISTINCT provider_id FROM provider_clean;
 
 # COMMAND ----------
 
